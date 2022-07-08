@@ -21,10 +21,9 @@ function computerPlay() {
 function playerPlay() {
     while (true) {
         let selection = prompt("Type 'Rock', 'Paper', or 'Scissors'");
-        if (selection)
-            selection = selection.toUpperCase();
-        else
+        if (!selection) 
             throw new Error("Cancelled game");
+        selection = selection.toUpperCase();
         for (let i = 0; i < 3; i++) {
             if (selection == optionNames[i].toUpperCase())
                 return i;
