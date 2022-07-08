@@ -1,4 +1,4 @@
-console.log(playRound(playerPlay(), computerPlay()));
+console.log(game());
 
 function computerPlay() {
     switch (Math.floor(3*Math.random())) {
@@ -21,7 +21,7 @@ function playerPlay() {
             case 'SCISSORS':
                 return "Scissors";
             default:
-                alert("Invalid selection");
+                console.log("Invalid selection");
         }
     }
 }
@@ -34,4 +34,25 @@ function playRound(playerSelection, computerSelection) {
     || (playerSelection == "Scissors" && computerSelection == "Rock"))
         return `You Lose! ${computerSelection} beats ${playerSelection}`;
     return `You Win! ${playerSelection} beats ${computerSelection}`;
+}
+
+function game() {
+    console.log("Welcome to a best of 5 game of Rock Paper Scissors!");
+    let playerScore = 0;
+    let computerScore = 0;
+    for (let i = 0; i < 5; i++) {
+        let message = playRound(playerPlay(), computerPlay());
+        console.log(message);
+        if (message.substring(4,7) == "Win")
+            playerScore++;
+        else if (message.substring(4,8) == "Lose")
+            computerScore++;
+    }
+    let result;
+    if (playerScore == computerScore)
+        result = `It's a tie!`;
+    if (playerScore > computerScore)
+        result = `You Win!`;
+    result = `You Lose!`;
+    return result + ` Score: ${playerScore}-${computerScore}-${5 - playerScore - computerScore}`
 }
