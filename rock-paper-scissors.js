@@ -1,5 +1,3 @@
-console.log(playAndReadGame());
-
 const Options = {
     Rock: 0,
     Paper: 1,
@@ -13,6 +11,8 @@ const Outcomes = {
 Object.freeze(Options);
 Object.freeze(Outcomes);
 const optionNames = ["Rock", "Paper", "Scissors"];
+
+playAndReadGame();
 
 function computerPlay() {
     return Math.floor(3*Math.random());
@@ -35,9 +35,9 @@ function playerPlay() {
 function playRound(playerSelection, computerSelection) {
     if (playerSelection == computerSelection)
         return Outcomes.Tie;
-    if ((playerSelection == Options.Rock && computerSelection == Options.Paper) 
-    || (playerSelection == Options.Paper && computerSelection == Options.Scissors) 
-    || (playerSelection == Options.Scissors && computerSelection == Options.Rock))
+    if ((playerSelection == Options.Rock && computerSelection == Options.Paper)
+     || (playerSelection == Options.Paper && computerSelection == Options.Scissors)
+     || (playerSelection == Options.Scissors && computerSelection == Options.Rock))
         return Outcomes.Lose;
     return Outcomes.Win;
 }
@@ -45,7 +45,7 @@ function playRound(playerSelection, computerSelection) {
 function readRoundWinner(outcome, playerChoice, computerChoice) {
     switch(outcome) {
         case Outcomes.Win:
-            `You Win! ${playerChoice} beats ${computerChoice}`;
+            return `You Win! ${playerChoice} beats ${computerChoice}`;
         case Outcomes.Lose:
             return `You Lose! ${computerChoice} beats ${playerChoice}`;
         case Outcomes.Tie:
@@ -68,16 +68,16 @@ function game(scoreCard) {
 }
 
 function readGameWinner(scoreCard) {
-    playerScore, computerScore, tieScore = game(scoreCard);
-    if (playerScore == computerScore)
-        result = `It's a tie!`;
+    let [playerScore, computerScore, tieScore] = scoreCard;
     if (playerScore > computerScore)
         result = `You Win!`;
-    result = `You Lose!`;
+    else if (playerScore < computerScore)
+        result = `You Lose!`;
+    else
+        result = `It's a tie!`;
     return result + ` Score: ${playerScore}-${computerScore}-${tieScore}`;
 }
 
 function playAndReadGame() {
-    let scoreCard = [0,0,0];
-    readGameWinner(game(scoreCard));
+    console.log(readGameWinner(game(new Array(3))));
 }
