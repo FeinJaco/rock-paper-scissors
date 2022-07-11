@@ -1,3 +1,4 @@
+//Represent int options and outcomes as const variables
 const Options = {
     Rock: 0,
     Paper: 1,
@@ -12,12 +13,14 @@ Object.freeze(Options);
 Object.freeze(Outcomes);
 const optionNames = ["Rock", "Paper", "Scissors"];
 
-playAndReadGame();
+playAndPrintGame();
 
+//Generate random number from 0-2 representing computer choice
 function computerPlay() {
     return Math.floor(3*Math.random());
 }
 
+//Get player choice input
 function playerPlay() {
     while (true) {
         let selection = prompt("Type 'Rock', 'Paper', or 'Scissors'");
@@ -32,6 +35,7 @@ function playerPlay() {
     }
 }
 
+//Determine round outcome of player vs computer
 function playRound(playerSelection, computerSelection) {
     if (playerSelection == computerSelection)
         return Outcomes.Tie;
@@ -42,6 +46,7 @@ function playRound(playerSelection, computerSelection) {
     return Outcomes.Win;
 }
 
+//Generate round winner message
 function readRoundWinner(outcome, playerChoice, computerChoice) {
     switch(outcome) {
         case Outcomes.Win:
@@ -53,6 +58,7 @@ function readRoundWinner(outcome, playerChoice, computerChoice) {
     }
 }
 
+//Play 5 player vs computer games and fill in score card
 function game(scoreCard) {
     console.log("Welcome to a best of 5 game of Rock Paper Scissors!");
     for (let i = 0; i < 3; i++)
@@ -67,6 +73,7 @@ function game(scoreCard) {
     return scoreCard;
 }
 
+//Generate game winner message
 function readGameWinner(scoreCard) {
     let [playerScore, computerScore, tieScore] = scoreCard;
     if (playerScore > computerScore)
@@ -78,6 +85,7 @@ function readGameWinner(scoreCard) {
     return result + ` Score: ${playerScore}-${computerScore}-${tieScore}`;
 }
 
-function playAndReadGame() {
+//Show game results in console
+function playAndPrintGame() {
     console.log(readGameWinner(game(new Array(3))));
 }
