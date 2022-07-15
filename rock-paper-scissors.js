@@ -1,4 +1,4 @@
-//Represent int options and outcomes as const variables
+//Represent int options, outcomes, and win rules as const variables
 const Options = {
     Rock: 0,
     Paper: 1,
@@ -9,52 +9,34 @@ const Outcomes = {
     Lose: 1,
     Tie: 2
 }
+const WinRules = {
+    BestOf: 0,
+    TotalPoints: 1,
+}
 Object.freeze(Options);
 Object.freeze(Outcomes);
+Object.freeze(WinRules);
+
+//Create const lists to convert selection values to names and back
 const optionNames = ["Rock", "Paper", "Scissors"];
-let optionNameUpperToId = {};
+const optionNameUpperToSelection = {};
 for (let i = 0; i < 3; i++) {
-    optionNameUpperToId[optionNames[i].toUpperCase()] = i;
+    optionNameUpperToSelection[optionNames[i].toUpperCase()] = i;
 }
-Object.freeze(optionNameUpperToId);
+Object.freeze(optionNameUpperToSelection);
+
+//Set const game settings and initialize global score card
 const COUNT = 5;
+const WIN_RULE = WinRules.TotalPoints;
 let globalScoreCard = [0,0,0];
-
-//Reset score card
-function resetScoreCard(scoreCard) {
-    for (let i = 0; i < 3; i++)
-        scoreCard[i] = 0;
-}
-
-//Reset score card if player or opponent has enough points
-function checkReset() {
-    if (globalScoreCard[Outcomes.Win] >= COUNT || globalScoreCard[Outcomes.Lose] >= COUNT) {
-        gameOutput.textContent = readGameWinner(globalScoreCard);
-        resetScoreCard(globalScoreCard);
-    }
-}
 
 //Generate random number from 0-2 representing computer choice
 function computerPlay() {
     return Math.floor(3*Math.random());
 }
 
-//Get player choice input from prompt
-function promptPlay() {
-    while (true) {
-        let selection = prompt("Type 'Rock', 'Paper', or 'Scissors'");
-        if (!selection)
-            throw new Error("Cancelled game");
-        selection = selection.toUpperCase();
-        let selectedOption = optionNameUpperToId[selection];
-        if (typeof selectedOption != 'undefined')
-            return selectedOption;
-        roundOutput.textContent = `Invalid selection: ${selectedOption}`;
-    }
-}
-
 //Determine round outcome of player vs computer
-function playRound(playerSelection, computerSelection) {
+function playRound(playerSelection, computerSelection=computerPlay()) {
     if (playerSelection == computerSelection)
         return Outcomes.Tie;
     if ((playerSelection == Options.Rock && computerSelection == Options.Paper)
@@ -62,18 +44,6 @@ function playRound(playerSelection, computerSelection) {
      || (playerSelection == Options.Scissors && computerSelection == Options.Rock))
         return Outcomes.Lose;
     return Outcomes.Win;
-}
-
-//Play round using button input as player selection
-function buttonPlayRound(playerSelectionName) {
-    gameOutput.textContent = ``;
-    let playerSelection = optionNameUpperToId[playerSelectionName.toUpperCase()];
-    let computerSelection = computerPlay();
-    let outcome = playRound(playerSelection, computerSelection);
-    roundOutput.textContent = readRoundWinner(outcome, optionNames[playerSelection], optionNames[computerSelection]);
-    globalScoreCard[outcome]++;
-    gameOutput.textContent = readScoreCard(globalScoreCard);
-    checkReset();
 }
 
 //Generate round winner message
@@ -88,68 +58,65 @@ function readRoundWinner(outcome, playerChoice, computerChoice) {
     }
 }
 
-function hasEnded(scoreCard, count) {
-    return Math.abs(scoreCard[Outcomes.Win] - scoreCard[Outcomes.Lose]) > count / 2;
-}
-
-//Play player vs computer games using prompts and fill in score card
-function game(scoreCard, count) {
-    let gameCountMsg = ``;
-    if (count > 1)
-        gameCountMsg = `best of ${count} `;
-    roundOutput.textContent = `Welcome to a ${gameCountMsg}game of Rock Paper Scissors!`;
-    for (let i = 0; i < 3; i++)
-        scoreCard[i] = 0;
-    for (let i = 0; i < count && !hasEnded(scoreCard); i++) {
-        let playerSelection = promptPlay();
-        let computerSelection = computerPlay();
-        let outcome = playRound(playerSelection, computerSelection);
-        roundOutput.textContent = readRoundWinner(outcome, optionNames[playerSelection], optionNames[computerSelection]);
-        scoreCard[outcome]++;
-    }
-    return scoreCard;
-}
-
-function readScoreCard(scoreCard) {
+//Read score card
+function readScoreCard(scoreCard=globalScoreCard) {
     let [playerScore, computerScore, tieScore] = scoreCard;
     return `Score: ${playerScore}-${computerScore}-${tieScore}`;
 }
 
 //Generate game winner message
-function readGameWinner(scoreCard) {
-    let [playerScore, computerScore, tieScore] = scoreCard;
+function readGameWinner(scoreCard=globalScoreCard) {
+    let [playerScore, computerScore,] = scoreCard;
     if (playerScore > computerScore)
         result = `You Win!`;
     else if (playerScore < computerScore)
         result = `You Lose!`;
     else
         result = `It's a tie!`;
-    return result + ` ` + readScoreCard(scoreCard);
+    return result + ` ` + readScoreCard();
 }
 
-//Show single-round game results
-function playAndPrintGame() {
-    playAndPrintGame(1);
+//Evaluate whether game is over
+function hasEnded(scoreCard=globalScoreCard, count=COUNT, winRule=WIN_RULE) {
+    if (winRule == WinRules.BestOf)
+        return Math.abs(scoreCard[Outcomes.Win] - scoreCard[Outcomes.Lose]) > count / 2;
+    if (winRule == WinRules.TotalPoints)
+        return scoreCard[Outcomes.Win] >= count || scoreCard[Outcomes.Lose] >= count;
 }
 
-//Show multiple-round game results
-function playAndPrintGame(count) {
-    gameOutput.textContent = readGameWinner(game(new Array(3), count));
+//Reset score card
+function resetScoreCard(scoreCard=globalScoreCard) {
+    for (let i = 0; i < 3; i++)
+        scoreCard[i] = 0;
 }
 
-const buttons = document.querySelectorAll('.selection');
+//Reset score card if player or opponent has enough points
+function checkReset() {
+    if (hasEnded()) {
+        gameOutput.textContent = readGameWinner();
+        resetScoreCard();
+    }
+}
+
+//Play round using button input as player selection
+function buttonPlayRound(playerChoice) {
+    gameOutput.textContent = ``;
+    let playerSelection = optionNameUpperToSelection[playerChoice.toUpperCase()];
+    let computerSelection = computerPlay();
+    let outcome = playRound(playerSelection, computerSelection);
+    roundOutput.textContent = readRoundWinner(outcome, optionNames[playerSelection], optionNames[computerSelection]);
+    globalScoreCard[outcome]++;
+    gameOutput.textContent = readScoreCard();
+    checkReset();
+}
+
+//Create variables for HTML I/O
+const buttons = document.querySelectorAll('button.selection');
 buttons.forEach((button) => {
     button.classList.add();
     button.addEventListener('click', () => {
         buttonPlayRound(button.textContent);
     })
 })
-const promptPlayButton = document.querySelector('.prompt-play');
-promptPlayButton.addEventListener('click', () => {
-    playAndPrintGame(COUNT);
-});
-const gameOutput = document.querySelector('.round-output');
-const roundOutput = document.querySelector('.game-output');
-/*gameOutput.addEventListener('error', () => {
-    gameOutput.textContent = console.error();
-});*/
+const roundOutput = document.querySelector('.round-output');
+const gameOutput = document.querySelector('.game-output');
