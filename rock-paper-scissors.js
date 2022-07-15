@@ -17,7 +17,7 @@ Object.freeze(Options);
 Object.freeze(Outcomes);
 Object.freeze(WinRules);
 
-//Create const lists to convert selection values to names and back
+//Create const lists to convert selection values to choice names and back
 const optionNames = ["Rock", "Paper", "Scissors"];
 const optionNameUpperToSelection = {};
 for (let i = 0; i < 3; i++) {
